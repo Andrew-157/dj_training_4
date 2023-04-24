@@ -5,12 +5,12 @@ from taggit.managers import TaggableManager
 
 class Movie(models.Model):
     UNITED_STATES = 'US'
-    ENGLAND = 'EN'
+    UNITED_KINGDOM = 'UK'
     POLAND = 'PL'
     CANADA = 'CA'
     COUNTRIES = (
         (UNITED_STATES, 'United States'),
-        (ENGLAND, 'England'),
+        (UNITED_KINGDOM, 'United Kingdom'),
         (POLAND, 'Poland'),
         (CANADA, 'Canada')
     )
