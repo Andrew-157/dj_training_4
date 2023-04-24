@@ -1,22 +1,22 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+from taggit.managers import TaggableManager
 
 
 class Movie(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    release = models.DateField()
-    genre = models.ForeignKey('movies.Genre', on_delete=models.CASCADE)
-    poster = models.ImageField(
-        upload_to='cookie/images/movies/', null=False
+    UNITED_STATES = 'US'
+    ENGLAND = 'EN'
+    POLAND = 'PL'
+    CANADA = 'CA'
+    COUNTRIES = (
+        (UNITED_STATES, 'United States'),
+        (ENGLAND, 'England'),
+        (POLAND, 'Poland'),
+        (CANADA, 'Canada')
     )
-
-    def __str__(self):
-        return self.title
-
-
-class Genre(models.Model):
     title = models.CharField(max_length=255)
-    slug = models.SlugField()
-
-    def __str__(self):
-        return self.title
+    synopsis = models.TextField()
+    release_date = models.DateField()
+    country = models.CharField(max_length=2, choices=COUNTRIES)
+    genres = TaggableManager(verbose_name='genres')
+    poster = models.ImageField(upload_to='cookie/images/movies/', null=False)
