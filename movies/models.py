@@ -20,3 +20,6 @@ class Movie(models.Model):
     country = models.CharField(max_length=2, choices=COUNTRIES)
     genres = TaggableManager(verbose_name='genres')
     poster = models.ImageField(upload_to='cookie/images/movies/', null=False)
+
+    def __str__(self):
+        return self.title
