@@ -18,7 +18,8 @@ class Movie(models.Model):
     synopsis = models.TextField()
     release_date = models.DateField()
     country = models.CharField(max_length=2, choices=COUNTRIES)
-    genres = TaggableManager(verbose_name='genres')
+    genres = TaggableManager(verbose_name='genres',
+                             help_text='A comma-separated list of genres.')
     poster = models.ImageField(upload_to='cookie/images/movies/', null=False)
 
     def __str__(self):
