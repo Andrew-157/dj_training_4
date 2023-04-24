@@ -1,0 +1,13 @@
+{% extends "movies/header.html" %}
+
+{% block content%}
+    <div class="container py-5">
+        <h2>Movies</h2>
+        <ul>
+            {% for movie in object_list %}
+            <li>{{ movie.title }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}
