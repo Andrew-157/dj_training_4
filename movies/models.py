@@ -16,6 +16,7 @@ class Movie(models.Model):
 
 class Genre(models.Model):
     title = models.CharField(max_length=255)
+    slug = models.SlugField()
 
     def __str__(self):
         return self.title
