@@ -47,20 +47,19 @@ class ReviewRateMovieBaseClass(View):
     success_message = ''
     nonexistent_template = 'movies/nonexistent.html'
 
-    def get_object(self, request, pk):
-        print('get object')
+    def get_object(self, pk):
         obj = Movie.objects.filter(pk=pk).first()
         return obj
 
     def get(self, request, *args, **kwargs):
-        movie = self.get_object(request, self.kwargs['pk'])
+        movie = self.get_object(self.kwargs['pk'])
         if not movie:
             return render(request, self.nonexistent_template)
         form = self.form_class()
         return render(request, self.template_name, {'form': form, 'movie_pk': movie.id})
 
     def post(self, request, **kwargs):
-        movie = self.get_object(request, kwargs['pk'])
+        movie = self.get_object(kwargs['pk'])
         if not movie:
             return render(request, self.nonexistent_template)
         form = self.form_class(request.POST)
