@@ -24,3 +24,11 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Rating(models.Model):
+    rating_choices = [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5),
+                      (6, 6), (7, 7), (8, 8), (9, 9), (10, 10)]
+    rating = models.PositiveSmallIntegerField(choices=rating_choices)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
