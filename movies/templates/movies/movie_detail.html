@@ -9,7 +9,7 @@
             <p>Country: <strong>{{ movie.get_country_display }}</strong></p>
             <p>Genres:</p>
             {% for genre in movie.genres.all %}
-                <a href="{% url 'movies:movie-list' genre.slug %}">{{ genre }}</a><br>
+                <a href="{% url 'movies:movies-by-genre' genre.slug %}">{{ genre }}</a><br>
             {% endfor %}
     </div>
 

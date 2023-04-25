@@ -6,7 +6,7 @@ from taggit.models import Tag
 from movies.models import Movie
 
 
-class MovieListView(ListView):
+class MoviesByGenre(ListView):
     model = Movie
     context_object_name = 'movies'
     template_name = "movies/movies_by_genre.html"
