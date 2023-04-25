@@ -1,9 +1,11 @@
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from django.views import View
 from taggit.models import Tag
 from movies.models import Movie
-from movies.forms import RatingForm
+from movies.forms import RateMovieForm
 
 
 class MoviesByGenre(ListView):
@@ -36,3 +38,29 @@ class MovieDetailView(DetailView):
         if not movie:
             return None
         return super().get_object()
+
+
+class RateMovieView(View):
+    form_class = RateMovieForm
+    template_name = 'movies/rate_movie.html'
+
+    def get_object(self, request, pk):
+        movie = Movie.objects.filter(pk=pk).first()
+        if not movie:
+            return render(request, 'movies/nonexistent.html')
+        return movie
+
+    def get(self, request, *args, **kwargs):
+        movie = self.get_object(request, self.kwargs['pk'])
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form, 'movie': movie})
+
+    def post(self, request, **kwargs):
+        movie = self.get_object(request, kwargs['pk'])
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.instance.movie = movie
+            form.instance.rated_by = request.user
+            form.save()
+            return HttpResponseRedirect(reverse('movies:movie-detail', args=(kwargs['pk'], )))
+        return render(request, self.template_name, {'form': form, 'movie': movie})
