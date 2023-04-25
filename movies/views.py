@@ -1,11 +1,12 @@
-from django.http import HttpResponseRedirect
+from django.contrib import messages
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from django.views import View
 from taggit.models import Tag
 from movies.models import Movie
-from movies.forms import RateMovieForm
+from movies.forms import RateMovieForm, ReviewMovieForm
 
 
 class MoviesByGenre(ListView):
@@ -40,27 +41,45 @@ class MovieDetailView(DetailView):
         return super().get_object()
 
 
-class RateMovieView(View):
-    form_class = RateMovieForm
-    template_name = 'movies/rate_movie.html'
+class ReviewRateMovieBaseClass(View):
+    form_class = None
+    template_name = ''
+    success_message = ''
+    nonexistent_template = 'movies/nonexistent.html'
 
     def get_object(self, request, pk):
-        movie = Movie.objects.filter(pk=pk).first()
-        if not movie:
-            return render(request, 'movies/nonexistent.html')
-        return movie
+        print('get object')
+        obj = Movie.objects.filter(pk=pk).first()
+        return obj
 
     def get(self, request, *args, **kwargs):
         movie = self.get_object(request, self.kwargs['pk'])
+        if not movie:
+            return render(request, self.nonexistent_template)
         form = self.form_class()
-        return render(request, self.template_name, {'form': form, 'movie': movie})
+        return render(request, self.template_name, {'form': form, 'movie_pk': movie.id})
 
     def post(self, request, **kwargs):
         movie = self.get_object(request, kwargs['pk'])
+        if not movie:
+            return render(request, self.nonexistent_template)
         form = self.form_class(request.POST)
         if form.is_valid():
             form.instance.movie = movie
-            form.instance.rated_by = request.user
+            form.instance.owner = request.user
             form.save()
+            messages.success(request, self.success_message)
             return HttpResponseRedirect(reverse('movies:movie-detail', args=(kwargs['pk'], )))
-        return render(request, self.template_name, {'form': form, 'movie': movie})
+        return render(request, self.template_name, {'form': form, 'movie_pk': movie.id})
+
+
+class ReviewMovieView(ReviewRateMovieBaseClass):
+    form_class = ReviewMovieForm
+    template_name = 'movies/review_movie.html'
+    success_message = 'You successfully reviewed a movie'
+
+
+class RateMovieView(ReviewRateMovieBaseClass):
+    form_class = RateMovieForm
+    template_name = 'movies/rate_movie.html'
+    success_message = 'You successfully rated a movie'

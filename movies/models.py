@@ -31,11 +31,11 @@ class Rating(models.Model):
                       (6, 6), (7, 7), (8, 8), (9, 9), (10, 10)]
     rating = models.PositiveSmallIntegerField(choices=rating_choices)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    rated_by = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    owner = models.ForeignKey('auth.User', on_delete=models.CASCADE)
 
 
 class Review(models.Model):
     review_content = models.TextField()
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    reviewed_by = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    owner = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     pub_date = models.DateTimeField(auto_now=True)
