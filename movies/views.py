@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
-from django.views.generic.detail import SingleObjectMixin
 from django.views import View
 from taggit.models import Tag
 from movies.models import Movie
+from movies.forms import RatingForm
 
 
 class MoviesByGenre(ListView):
@@ -24,10 +24,15 @@ class MoviesByGenre(ListView):
         return context
 
 
-class MovieDetailView(View):
-    def get(self, request, *args, **kwargs):
-        movie = Movie.objects.prefetch_related(
-            'genres').filter(pk=kwargs['pk']).first()
+class MovieDetailView(DetailView):
+    model = Movie
+    template_name = 'movies/movie_detail.html'
+    queryset = Movie.objects.prefetch_related('genres').all()
+    context_object_name = 'movie'
+
+    def get_object(self):
+        movie_pk = self.kwargs['pk']
+        movie = Movie.objects.filter(pk=movie_pk).first()
         if not movie:
-            return render(request, 'movies/nonexistent.html')
-        return render(request, 'movies/movie_detail.html', {'movie': movie})
+            return None
+        return super().get_object()
