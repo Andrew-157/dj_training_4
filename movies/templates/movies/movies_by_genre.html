@@ -1,0 +1,25 @@
+{% extends "movies/header.html" %}
+
+{% block content%}
+    <div class="container py-5">
+        <h2>---Movies---</h2>
+        {% if not movies %}
+            <p>No movies were found in genre <strong>{{genre}}</strong></p>
+        {% elif movies|length == 1%}
+            <p>1 movie was found in genre <strong>{{genre}}</strong></p>
+        {% else %}
+            <p>{{ movies|length }} movies were found in genre <strong>{{genre}}</strong></p>
+        {% endif %}
+        {% for movie in movies %}
+            <h2>Title "movie.title"</h2>
+            <img src="{{ movie.poster.url }}" alt="Movie poster" style="width: 10%; float: right; margin-right: 10px;">
+            <p>{{ movie.synopsis }}</p>
+            <p>Release date: <strong>{{ movie.release_date }}</strong></p>
+            <p>Country: <strong>{{ movie.get_country_display }}</strong></p>
+            {% for genre in movie.genres.all %}
+                <a href="">{{ genre }}</a><br>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+{% endblock %}
