@@ -65,7 +65,8 @@ class ReviewsByMovieList(ListView):
 class MovieDetailView(DetailView):
     model = Movie
     template_name = 'movies/movie_detail.html'
-    queryset = Movie.objects.prefetch_related('genres').all()
+    queryset = Movie.objects.prefetch_related('genres').all().\
+        annotate(avg_rating=Avg('rating__rating'))
     context_object_name = 'movie'
 
     def get_object(self):

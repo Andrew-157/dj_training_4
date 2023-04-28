@@ -3,6 +3,11 @@
 {% block content %}
     <div class="container py-5">
         <h2>Title: "{{movie.title}}"</h2>
+            {% if not movie.avg_rating %}
+                <p>This movie still was not rated by anyone </p>
+            {% else %}
+                <p>This movie was rated as <strong>{{ movie.avg_rating }}</strong> by our users</p>
+            {% endif %}
             <a href="{% url 'movies:movie-reviews' movie.id %}">Read reviews of this movie</a>
             <img src="{{ movie.poster.url }}" alt="Movie poster" style="width: 10%; float: right; margin-right: 10px;">
             <p>{{ movie.synopsis }}</p>

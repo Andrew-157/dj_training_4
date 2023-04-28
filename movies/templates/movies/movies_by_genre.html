@@ -15,7 +15,7 @@
         <div class="container py-5">
             <h2>Title: "{{movie.title}}"</h2>
             {% if not movie.avg_rating %}
-                <p>This movie was not still rated by anyone</p>
+                <p>This movie still was not rated by anyone</p>
             {% else %}
                 <p>Rating: <strong>{{ movie.avg_rating }}</strong></p>
             {% endif %}
