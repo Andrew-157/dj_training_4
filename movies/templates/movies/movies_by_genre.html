@@ -14,7 +14,7 @@
         {% for movie in movies %}
         <div class="container py-5">
             <h2>Title: "{{movie.title}}"</h2>
-            <p><strong>{{ movie.avg_rating }}</strong></p>
+            <p>Rating: <strong>{{ movie.avg_rating }}</strong></p>
             <a href="{% url 'movies:movie-detail' movie.id %}">Find out more about this movie</a>
             <img src="{{ movie.poster.url }}" alt="Movie poster" style="width: 10%; float: right; margin-right: 10px;">
             <p>Release date: <strong>{{ movie.release_date }}</strong></p>
