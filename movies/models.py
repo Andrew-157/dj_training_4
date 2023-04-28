@@ -35,7 +35,7 @@ class Rating(models.Model):
 
 
 class Review(models.Model):
-    review_content = models.TextField()
+    content = models.TextField()
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     pub_date = models.DateTimeField(auto_now=True)

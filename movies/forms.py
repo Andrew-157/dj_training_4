@@ -11,4 +11,4 @@ class RateMovieForm(forms.ModelForm):
 class ReviewMovieForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ['review_content']
+        fields = ['content']

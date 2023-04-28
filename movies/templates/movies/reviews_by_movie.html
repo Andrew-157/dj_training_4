@@ -1,0 +1,21 @@
+{% extends "movies/header.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <h1>You are reading reviews about movie <a href="{% url 'movies:movie-detail' movie.id %}">{{ movie }}</a></h1>
+        <a href="{% url 'movies:review-movie' movie.id %}">Leave your review for this movie</a>
+        {% if not reviews %}
+            <p>No reviews were found about this movie</p>
+        {% elif reviews|length == 1%}
+            <p>1 review was found about this movie</p>
+        {% else %}
+            <p>{{ movies|length }} reviews were found about this movie</p>
+        {% endif %}
+        {% for review in reviews %}
+            <div class="container py-5">
+                <p>{{ review.content }}</p>
+                <p>Was left by {{ review.owner }} on {{ review.pub_date.date }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock%}

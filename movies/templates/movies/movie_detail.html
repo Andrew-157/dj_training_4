@@ -1,7 +1,6 @@
 {% extends "movies/header.html" %}
 
 {% block content %}
-    {% if movie %}
     <div class="container py-5">
         <h2>Title: "{{movie.title}}"</h2>
             <img src="{{ movie.poster.url }}" alt="Movie poster" style="width: 10%; float: right; margin-right: 10px;">
@@ -13,10 +12,4 @@
                 <a href="{% url 'movies:movies-by-genre' genre.slug %}">{{ genre }}</a><br>
             {% endfor %}
     </div>
-    {% else %}
-        <div class="container py-5">
-        <h1>Oops, this resource does not exist</h1>
-        <p>Visit <a href="">Cookie Homepage</a> and try something else</p>
-    </div>
-    {% endif %}
 {% endblock %}
