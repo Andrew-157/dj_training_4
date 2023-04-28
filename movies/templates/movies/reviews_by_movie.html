@@ -5,6 +5,8 @@
         <h1>You are reading reviews about movie <a href="{% url 'movies:movie-detail' movie.id %}">{{ movie }}</a></h1>
         {% if not user_has_review %}
             <a href="{% url 'movies:review-movie' movie.id %}">Leave your review for this movie</a>
+        {% else %}
+            <a href="{% url 'movies:update-review' movie.id %}">Update your review of this movie</a>
         {% endif %}
         {% if not reviews %}
             <p>No reviews were found about this movie</p>

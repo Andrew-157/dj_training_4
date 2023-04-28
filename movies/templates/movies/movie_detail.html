@@ -10,6 +10,7 @@
             {% endif %}
             {% if rating_by_user %}
                 <p>You rated this movie as <strong>{{ rating_by_user }}</strong> out of 10</p>
+                <a href="{% url 'movies:update-rating' movie.id %}">Change your rating</a><br>
             {% else %}
                 <a href="{% url 'movies:rate-movie' movie.id %}">Rate this movie</a><br>
             {% endif %}

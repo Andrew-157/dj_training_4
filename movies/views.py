@@ -152,22 +152,79 @@ class ReviewRateMovieBaseClass(View):
     def post(self, request, **kwargs):
         current_user = request.user
         movie = self.get_object(kwargs['pk'])
-        if not movie:
-            return render(request, self.nonexistent_template)
-        if not current_user.is_authenticated:
-            messages.info(request, self.info_message)
-            return HttpResponseRedirect(reverse(self.redirect_to, args=(movie.id, )))
-        if self.exists(current_user, movie.pk):
-            messages.warning(request, self.warning_message)
-            return HttpResponseRedirect(reverse(self.redirect_to, args=(movie.id, )))
         form = self.form_class(request.POST)
         if form.is_valid():
             form.instance.movie = movie
-            form.instance.owner = request.user
+            form.instance.owner = current_user
             form.save()
             messages.success(request, self.success_message)
-            return HttpResponseRedirect(reverse('movies:movie-detail', args=(kwargs['pk'], )))
+            return HttpResponseRedirect(reverse(self.redirect_to, args=(kwargs['pk'], )))
         return render(request, self.template_name, {'form': form, 'movie': movie})
+
+
+class UpdateRateReviewMovieBaseClass(View):
+    form_class = None
+    template_name = ''
+    nonexistent_template = 'movies/nonexistent.html'
+    redirect_to = ''
+    warning_message = ''
+    success_message = ''
+    model = ''
+
+    def get_movie(self, pk):
+        return Movie.objects.filter(pk=pk).first()
+
+    def exists(self, owner, pk):
+        model = self.model
+        return model.objects.filter(
+            Q(owner=owner) &
+            Q(movie__pk=pk)
+        ).first()
+
+    def get(self, request, *args, **kwargs):
+        current_user = request.user
+        movie = self.get_movie(self.kwargs['pk'])
+        if not movie:
+            return render(request, self.nonexistent_template)
+        obj = self.exists(current_user, movie.id)
+        if not obj:
+            messages.warning(request, self.warning_message)
+            return HttpResponseRedirect(reverse(self.redirect_to, args=(movie.id, )))
+        form = self.form_class(instance=obj)
+        return render(request, self.template_name, {'form': form, 'movie': movie})
+
+    def post(self, request, **kwargs):
+        current_user = request.user
+        movie = self.get_movie(kwargs['pk'])
+        obj = self.exists(current_user, movie.id)
+        form = self.form_class(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, self.success_message)
+            return HttpResponseRedirect(reverse(self.redirect_to, args=(self.kwargs['pk'], )))
+        return render(request, self.template_name, {'form': form, 'movie': movie})
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+
+class UpdateReviewMovieView(UpdateRateReviewMovieBaseClass):
+    form_class = ReviewMovieForm
+    template_name = 'movies/update_review.html'
+    redirect_to = 'movies:movie-reviews'
+    success_message = 'You successfully updated your review on this movie'
+    warning_message = 'You have not reviewed this movie yet, you cannot update your review'
+    model = Review
+
+
+class UpdateRateMovieView(UpdateRateReviewMovieBaseClass):
+    form_class = RateMovieForm
+    template_name = 'movies/update_rating.html'
+    redirect_to = 'movies:movie-detail'
+    success_message = 'You successfully updated your rating of this movie'
+    warning_message = 'You have not rated this movie yet, you cannot update your rating'
+    model = Rating
 
 
 class ReviewMovieView(ReviewRateMovieBaseClass):
@@ -186,5 +243,5 @@ class RateMovieView(ReviewRateMovieBaseClass):
     success_message = 'You successfully rated a movie'
     redirect_to = 'movies:movie-detail'
     info_message = 'You cannot rate movie while you are not authenticated'
-    warning_message = 'You can only change your rate of a movie, not write a new one'
+    warning_message = 'You can only change your rate of a movie, not add a new one'
     model = Rating

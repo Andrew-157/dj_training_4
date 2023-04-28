@@ -13,8 +13,12 @@ urlpatterns = [
          views.MoviesByGenre.as_view(), name='movies-by-genre'),
     path('movies/<int:pk>/', views.MovieDetailView.as_view(), name='movie-detail'),
     path('movies/<int:pk>/rate/', views.RateMovieView.as_view(), name='rate-movie'),
+    path('movies/<int:pk>/rate/update',
+         views.UpdateRateMovieView.as_view(), name='update-rating'),
     path('movies/<int:pk>/review/',
          views.ReviewMovieView.as_view(), name='review-movie'),
     path('movies/<int:pk>/reviews/',
-         views.ReviewsByMovieList.as_view(), name='movie-reviews')
+         views.ReviewsByMovieList.as_view(), name='movie-reviews'),
+    path('movies/<int:pk>/reviews/update',
+         views.UpdateReviewMovieView.as_view(), name='update-review'),
 ]
