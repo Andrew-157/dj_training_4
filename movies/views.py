@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from django.db.models import Avg
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -21,7 +21,9 @@ class MoviesByGenre(ListView):
         genre = self.kwargs['genre']
         genre_object = Tag.objects.filter(slug=genre).first()
         movies = Movie.objects.prefetch_related(
-            'genres').filter(genres=genre_object).order_by('-release_date').all()
+            'genres').filter(genres=genre_object).\
+            order_by('-release_date').all().\
+            annotate(avg_rating=Avg('rating__rating'))
         return movies
 
     def get_context_data(self, **kwargs):
@@ -48,7 +50,7 @@ class ReviewsByMovieList(ListView):
         self.kwargs['movie'] = movie
         return reviews
 
-    def get_context_data(self, **kwargs: Any):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # variable valid_movie_pk lets us know if pk provided in url is valid
         # if it is not, then we return context as it was because we are gonna show
