@@ -1,6 +1,8 @@
 from django.contrib import messages
-from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from django.views import View
@@ -70,6 +72,10 @@ class ReviewRateMovieBaseClass(View):
             messages.success(request, self.success_message)
             return HttpResponseRedirect(reverse('movies:movie-detail', args=(kwargs['pk'], )))
         return render(request, self.template_name, {'form': form, 'movie_pk': movie.id})
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
 
 class ReviewMovieView(ReviewRateMovieBaseClass):

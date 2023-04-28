@@ -139,7 +139,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-# LOGIN_URL = reverse_lazy('movies:become-user')
+LOGIN_URL = reverse_lazy('movies:become-user')
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-secondary',
