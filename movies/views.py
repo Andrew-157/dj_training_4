@@ -40,16 +40,26 @@ class ReviewsByMovieList(ListView):
     context_object_name = 'reviews'
     template_name = "movies/reviews_by_movie.html"
     valid_movie_pk = True
+    user_has_review = False
 
     def get_queryset(self):
         pk = self.kwargs['pk']
         movie = Movie.objects.filter(pk=pk).first()
+        # return nonexistent.html if no movie with this pk
         if not movie:
             self.valid_movie_pk = False
             self.template_name = 'movies/nonexistent.html'
             return None
+        # find all reviews about the movie
         reviews = Review.objects.select_related('owner').\
             order_by('-pub_date').filter(movie=movie).all()
+        # find all ids of users that left review on the movie
+        # to check if current user already has a review
+        review_owner_ids = [review.owner.id for review in reviews]
+        current_user = self.request.user
+        if current_user.is_authenticated and current_user.id in review_owner_ids:
+            # if user has a review change self.user_has_review to True for further usage
+            self.user_has_review = True
         self.kwargs['movie'] = movie
         return reviews
 
@@ -62,14 +72,8 @@ class ReviewsByMovieList(ListView):
             return context
         else:
             context['movie'] = self.kwargs['movie']
+            context['user_has_review'] = self.user_has_review
             return context
-
-
-class UpdateMovieRate(UpdateView):
-    form_class = RateMovieForm
-    model = Rating
-    template_name = 'movies/rate_movie.html'
-    fields = ['rating']
 
 
 class MovieDetailView(DetailView):
@@ -129,11 +133,16 @@ class ReviewRateMovieBaseClass(View):
     def get(self, request, *args, **kwargs):
         current_user = request.user
         movie = self.get_object(self.kwargs['pk'])
+        # if no movie with this id return nonexistent.html
         if not movie:
             return render(request, self.nonexistent_template)
+        # if user is not authenticated they cannot neither rate movie nor review it
         if not current_user.is_authenticated:
             messages.info(request, self.info_message)
             return HttpResponseRedirect(reverse(self.redirect_to, args=(movie.id, )))
+        # if user already has a review or rating of a movie
+        # and tries to hit urls for rating or reviewing,
+        # we return a warning that they can only change their review or rating
         if self.exists(current_user, movie.pk):
             messages.warning(request, self.warning_message)
             return HttpResponseRedirect(reverse(self.redirect_to, args=(movie.id, )))

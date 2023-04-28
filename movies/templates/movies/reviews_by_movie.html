@@ -3,7 +3,9 @@
 {% block content %}
     <div class="container py-5">
         <h1>You are reading reviews about movie <a href="{% url 'movies:movie-detail' movie.id %}">{{ movie }}</a></h1>
-        <a href="{% url 'movies:review-movie' movie.id %}">Leave your review for this movie</a>
+        {% if not user_has_review %}
+            <a href="{% url 'movies:review-movie' movie.id %}">Leave your review for this movie</a>
+        {% endif %}
         {% if not reviews %}
             <p>No reviews were found about this movie</p>
         {% elif reviews|length == 1%}
