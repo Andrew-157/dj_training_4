@@ -1,4 +1,6 @@
+from typing import Any, Dict
 from django.db.models import Avg
+from django.db.models.query_utils import Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -7,8 +9,9 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from django.views import View
+from django.views.generic.edit import UpdateView
 from taggit.models import Tag
-from movies.models import Movie, Review
+from movies.models import Movie, Review, Rating
 from movies.forms import RateMovieForm, ReviewMovieForm
 
 
@@ -46,7 +49,7 @@ class ReviewsByMovieList(ListView):
             self.template_name = 'movies/nonexistent.html'
             return None
         reviews = Review.objects.select_related('owner').\
-            order_by('-pub_date').filter(pk=pk).all()
+            order_by('-pub_date').filter(movie=movie).all()
         self.kwargs['movie'] = movie
         return reviews
 
@@ -60,6 +63,13 @@ class ReviewsByMovieList(ListView):
         else:
             context['movie'] = self.kwargs['movie']
             return context
+
+
+class UpdateMovieRate(UpdateView):
+    form_class = RateMovieForm
+    model = Rating
+    template_name = 'movies/rate_movie.html'
+    fields = ['rating']
 
 
 class MovieDetailView(DetailView):
@@ -77,14 +87,40 @@ class MovieDetailView(DetailView):
             return None
         return super().get_object()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
+        movie_pk = self.kwargs['pk']
+        if current_user.is_authenticated:
+            rating_by_user = Rating.objects.filter(
+                Q(owner=current_user) &
+                Q(movie__pk=movie_pk)
+            ).first()
+            if rating_by_user:
+                context['rating_by_user'] = rating_by_user.rating
+            else:
+                context['rating_by_user'] = None
+        else:
+            context['rating_by_user'] = None
+        return context
+
 
 class ReviewRateMovieBaseClass(View):
     form_class = None
     template_name = ''
     success_message = ''
     info_message = ''
+    warning_message = ''
     nonexistent_template = 'movies/nonexistent.html'
     redirect_to = ''
+    model = None
+
+    def exists(self, owner, pk):
+        model = self.model
+        return model.objects.filter(
+            Q(owner=owner) &
+            Q(movie__pk=pk)
+        ).first()
 
     def get_object(self, pk):
         obj = Movie.objects.filter(pk=pk).first()
@@ -98,8 +134,11 @@ class ReviewRateMovieBaseClass(View):
         if not current_user.is_authenticated:
             messages.info(request, self.info_message)
             return HttpResponseRedirect(reverse(self.redirect_to, args=(movie.id, )))
+        if self.exists(current_user, movie.pk):
+            messages.warning(request, self.warning_message)
+            return HttpResponseRedirect(reverse(self.redirect_to, args=(movie.id, )))
         form = self.form_class()
-        return render(request, self.template_name, {'form': form, 'movie_pk': movie.id})
+        return render(request, self.template_name, {'form': form, 'movie': movie})
 
     def post(self, request, **kwargs):
         current_user = request.user
@@ -109,6 +148,9 @@ class ReviewRateMovieBaseClass(View):
         if not current_user.is_authenticated:
             messages.info(request, self.info_message)
             return HttpResponseRedirect(reverse(self.redirect_to, args=(movie.id, )))
+        if self.exists(current_user, movie.pk):
+            messages.warning(request, self.warning_message)
+            return HttpResponseRedirect(reverse(self.redirect_to, args=(movie.id, )))
         form = self.form_class(request.POST)
         if form.is_valid():
             form.instance.movie = movie
@@ -116,15 +158,17 @@ class ReviewRateMovieBaseClass(View):
             form.save()
             messages.success(request, self.success_message)
             return HttpResponseRedirect(reverse('movies:movie-detail', args=(kwargs['pk'], )))
-        return render(request, self.template_name, {'form': form, 'movie_pk': movie.id})
+        return render(request, self.template_name, {'form': form, 'movie': movie})
 
 
 class ReviewMovieView(ReviewRateMovieBaseClass):
     form_class = ReviewMovieForm
     template_name = 'movies/review_movie.html'
     success_message = 'You successfully reviewed a movie'
-    redirect_to = 'movies:movie-detail'
+    redirect_to = 'movies:movie-reviews'
     info_message = 'You cannot review movie while you are not authenticated'
+    warning_message = 'You can only change your existing review of a movie, not write a new one'
+    model = Review
 
 
 class RateMovieView(ReviewRateMovieBaseClass):
@@ -133,3 +177,5 @@ class RateMovieView(ReviewRateMovieBaseClass):
     success_message = 'You successfully rated a movie'
     redirect_to = 'movies:movie-detail'
     info_message = 'You cannot rate movie while you are not authenticated'
+    warning_message = 'You can only change your rate of a movie, not write a new one'
+    model = Rating

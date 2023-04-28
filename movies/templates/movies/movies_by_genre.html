@@ -17,7 +17,7 @@
             {% if not movie.avg_rating %}
                 <p>This movie still was not rated by anyone</p>
             {% else %}
-                <p>Rating: <strong>{{ movie.avg_rating }}</strong></p>
+                <p>Rating: <strong>{{ movie.avg_rating }}</strong> out of 10</p>
             {% endif %}
             <a href="{% url 'movies:movie-detail' movie.id %}">Find out more about this movie</a>
             <img src="{{ movie.poster.url }}" alt="Movie poster" style="width: 10%; float: right; margin-right: 10px;">

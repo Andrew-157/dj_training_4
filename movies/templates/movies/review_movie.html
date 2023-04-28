@@ -4,7 +4,7 @@
     {% load crispy_forms_tags %}
     <div class="container py-5">
         <h1>Leave your review on movie "{{ movie.title }}"</h1>
-        <form action="{% url 'movies:review-movie' movie_pk %}" method="post">
+        <form action="{% url 'movies:review-movie' movie.id %}" method="post">
             {% csrf_token %} 
             {{ form|crispy }}
             <button class="btn btn-primary" type="submit">Rate</button>

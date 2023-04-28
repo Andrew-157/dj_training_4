@@ -6,7 +6,12 @@
             {% if not movie.avg_rating %}
                 <p>This movie still was not rated by anyone </p>
             {% else %}
-                <p>This movie was rated as <strong>{{ movie.avg_rating }}</strong> by our users</p>
+                <p>This movie was rated as <strong>{{ movie.avg_rating }}</strong> out of 10 by our users</p>
+            {% endif %}
+            {% if rating_by_user %}
+                <p>You rated this movie as <strong>{{ rating_by_user }}</strong> out of 10</p>
+            {% else %}
+                <a href="{% url 'movies:rate-movie' movie.id %}">Rate this movie</a><br>
             {% endif %}
             <a href="{% url 'movies:movie-reviews' movie.id %}">Read reviews of this movie</a>
             <img src="{{ movie.poster.url }}" alt="Movie poster" style="width: 10%; float: right; margin-right: 10px;">

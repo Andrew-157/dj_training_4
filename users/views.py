@@ -47,6 +47,7 @@ class LoginUserView(UserBaseView):
                 login(request, user)
                 messages.success(
                     request, f'Welcome back to "Cookie",{username}!')
+                return redirect('movies:index')
         return render(request, self.template_name, {'form': form})
 
 
