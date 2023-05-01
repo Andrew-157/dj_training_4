@@ -161,7 +161,7 @@ class ReviewRateMovieBaseClass(View):
         return render(request, self.template_name, {'form': form, 'movie': movie})
 
 
-class UpdateRateReviewMovieBaseClass(View):
+class UpdateMovieRatingReviewBaseClass(View):
     form_class = None
     template_name = ''
     nonexistent_template = 'movies/nonexistent.html'
@@ -208,7 +208,7 @@ class UpdateRateReviewMovieBaseClass(View):
         return super().dispatch(request, *args, **kwargs)
 
 
-class DeleteReviewRateMovieBaseClass(View):
+class DeleteMovieRatingReviewBaseClass(View):
     nonexistent_template = 'movies/nonexistent.html'
     redirect_to = ''
     warning_message = ''
@@ -243,21 +243,21 @@ class DeleteReviewRateMovieBaseClass(View):
         return super().dispatch(request, *args, **kwargs)
 
 
-class DeleteReviewMovieView(DeleteReviewRateMovieBaseClass):
+class DeleteMovieReviewView(DeleteMovieRatingReviewBaseClass):
     model = Review
     redirect_to = 'movies:movie-reviews'
     success_message = 'You successfully deleted your review of this movie'
     warning_message = 'You have not reviewed this movie yet, you cannot delete a nonexistent review'
 
 
-class DeleteRateMovieView(DeleteReviewRateMovieBaseClass):
+class DeleteMovieRatingView(DeleteMovieRatingReviewBaseClass):
     model = Rating
     redirect_to = 'movies:movie-detail'
     success_message = 'You successfully deleted your rating of this movie'
     warning_message = 'You have not rated this movie yet, you cannot delete a nonexistent rating'
 
 
-class UpdateReviewMovieView(UpdateRateReviewMovieBaseClass):
+class UpdateMovieReviewView(UpdateMovieRatingReviewBaseClass):
     form_class = ReviewMovieForm
     template_name = 'movies/update_review.html'
     redirect_to = 'movies:movie-reviews'
@@ -266,7 +266,7 @@ class UpdateReviewMovieView(UpdateRateReviewMovieBaseClass):
     model = Review
 
 
-class UpdateRateMovieView(UpdateRateReviewMovieBaseClass):
+class UpdateMovieRatingView(UpdateMovieRatingReviewBaseClass):
     form_class = RateMovieForm
     template_name = 'movies/update_rating.html'
     redirect_to = 'movies:movie-detail'

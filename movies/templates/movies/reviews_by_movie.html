@@ -4,10 +4,19 @@
     <div class="container py-5">
         <h1>You are reading reviews about movie <a href="{% url 'movies:movie-detail' movie.id %}">{{ movie }}</a></h1>
         {% if not user_has_review %}
-            <a href="{% url 'movies:review-movie' movie.id %}">Leave your review for this movie</a>
+            <form action="{% url 'movies:review-movie' movie.id %}">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">Review this movie</button>
+            </form>
         {% else %}
-            <a href="{% url 'movies:update-review' movie.id %}">Update your review of this movie</a><br>
-            <a href="{% url 'movies:delete-review' movie.id %}">Delete your review on this movie</a>
+            <form action="{% url 'movies:update-review' movie.id %}">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">Update your review of this movie</button>
+            </form>
+            <form action="{% url 'movies:delete-review' movie.id %}">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">Review this movie</button>
+            </form>
         {% endif %}
         {% if not reviews %}
             <p>No reviews were found about this movie</p>
