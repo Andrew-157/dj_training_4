@@ -1,0 +1,33 @@
+{% extends "movies/header.html" %}
+
+{% block content%}
+    <div class="container py-5">
+        <h2>---Movies---</h2>
+        {% if not movies %}
+            <p>No movies were found with <strong>"{{ search_string }}"</strong> in title</p>
+        {% elif movies|length == 1%}
+            <p>1 movie was found with <strong>"{{ search_string }}"</strong> in title</p>
+        {% else %}
+            <p>{{ movies|length }} movies were found with <strong>"{{ search_string }}"</strong> in title</p>
+        {% endif %}
+    </div>
+        {% for movie in movies %}
+        <div class="container py-5">
+            <h2>Title: "{{movie.title}}"</h2>
+            {% if not movie.avg_rating %}
+                <p>This movie still was not rated by anyone</p>
+            {% else %}
+                <p>Rating: <strong>{{ movie.avg_rating }}</strong> out of 10</p>
+            {% endif %}
+            <a href="{% url 'movies:movie-detail' movie.id %}">Find out more about this movie</a>
+            <img src="{{ movie.poster.url }}" alt="Movie poster" style="width: 10%; float: right; margin-right: 10px;">
+            <p>Release date: <strong>{{ movie.release_date }}</strong></p>
+            <p>Country: <strong>{{ movie.get_country_display }}</strong></p>
+            {% for genre in movie.genres.all %}
+                <a href="{% url 'movies:movies-by-genre' genre.slug %}">{{ genre }}</a><br>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

@@ -245,3 +245,16 @@ class RateMovieView(ReviewRateMovieBaseClass):
     info_message = 'You cannot rate movie while you are not authenticated'
     warning_message = 'You can only change your rate of a movie, not add a new one'
     model = Rating
+
+
+def search_movies(request):
+    search_string = request.POST['search_string']
+    if not search_string:
+        return render(request, 'movies/nonexistent.html')
+    movies = Movie.objects.\
+        prefetch_related('genres').\
+        filter(Q(title__icontains=search_string)).\
+        order_by('-release_date').all().\
+        annotate(avg_rating=Avg('rating__rating'))
+    return render(request, 'movies/search_movies.html', {'movies': movies,
+                                                         'search_string': search_string})

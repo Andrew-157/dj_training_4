@@ -21,4 +21,5 @@ urlpatterns = [
          views.ReviewsByMovieList.as_view(), name='movie-reviews'),
     path('movies/<int:pk>/reviews/update',
          views.UpdateReviewMovieView.as_view(), name='update-review'),
+     path('movies/search/', views.search_movies, name='search-movies')
 ]
