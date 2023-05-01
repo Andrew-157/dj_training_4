@@ -14,11 +14,16 @@ urlpatterns = [
     path('movies/<int:pk>/rate/', views.RateMovieView.as_view(), name='rate-movie'),
     path('movies/<int:pk>/rate/update',
          views.UpdateRateMovieView.as_view(), name='update-rating'),
-    path('movies/<int:pk>/review/',
-         views.ReviewMovieView.as_view(), name='review-movie'),
+    path('movies/<int:pk>/rate/delete',
+         views.DeleteRateMovieView.as_view(), name='delete-rating'),
     path('movies/<int:pk>/reviews/',
          views.ReviewsByMovieList.as_view(), name='movie-reviews'),
-    path('movies/<int:pk>/reviews/update',
+    path('movies/<int:pk>/review/',
+         views.ReviewMovieView.as_view(), name='review-movie'),
+    path('movies/<int:pk>/review/update',
          views.UpdateReviewMovieView.as_view(), name='update-review'),
-    path('movies/search/', views.search_movies, name='search-movies')
+    path('movies/<int:pk>/review/delete',
+         views.DeleteReviewMovieView.as_view(), name='delete-review'),
+    path('movies/search/', views.search_movies, name='search-movies'),
+
 ]

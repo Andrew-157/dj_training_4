@@ -6,7 +6,8 @@
         {% if not user_has_review %}
             <a href="{% url 'movies:review-movie' movie.id %}">Leave your review for this movie</a>
         {% else %}
-            <a href="{% url 'movies:update-review' movie.id %}">Update your review of this movie</a>
+            <a href="{% url 'movies:update-review' movie.id %}">Update your review of this movie</a><br>
+            <a href="{% url 'movies:delete-review' movie.id %}">Delete your review on this movie</a>
         {% endif %}
         {% if not reviews %}
             <p>No reviews were found about this movie</p>

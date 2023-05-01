@@ -9,7 +9,6 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from django.views import View
-from django.views.generic.edit import UpdateView
 from taggit.models import Tag
 from movies.models import Movie, Review, Rating
 from movies.forms import RateMovieForm, ReviewMovieForm
@@ -209,12 +208,61 @@ class UpdateRateReviewMovieBaseClass(View):
         return super().dispatch(request, *args, **kwargs)
 
 
+class DeleteReviewRateMovieBaseClass(View):
+    nonexistent_template = 'movies/nonexistent.html'
+    redirect_to = ''
+    warning_message = ''
+    success_message = ''
+    model = ''
+
+    def get_movie(self, pk):
+        return Movie.objects.filter(pk=pk).first()
+
+    def exists(self, owner, pk):
+        model = self.model
+        return model.objects.filter(
+            Q(owner=owner) &
+            Q(movie__pk=pk)
+        ).first()
+
+    def get(self, request, *args, **kwargs):
+        current_user = request.user
+        movie = self.get_movie(self.kwargs['pk'])
+        if not movie:
+            return render(request, self.nonexistent_template)
+        obj = self.exists(current_user, movie.id)
+        if not obj:
+            messages.warning(request, self.warning_message)
+            return HttpResponseRedirect(reverse(self.redirect_to, args=(movie.id,)))
+        obj.delete()
+        messages.success(request, self.success_message)
+        return HttpResponseRedirect(reverse(self.redirect_to, args=(movie.id, )))
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+
+class DeleteReviewMovieView(DeleteReviewRateMovieBaseClass):
+    model = Review
+    redirect_to = 'movies:movie-reviews'
+    success_message = 'You successfully deleted your review of this movie'
+    warning_message = 'You have not reviewed this movie yet, you cannot delete a nonexistent review'
+
+
+class DeleteRateMovieView(DeleteReviewRateMovieBaseClass):
+    model = Rating
+    redirect_to = 'movies:movie-detail'
+    success_message = 'You successfully deleted your rating of this movie'
+    warning_message = 'You have not rated this movie yet, you cannot delete a nonexistent rating'
+
+
 class UpdateReviewMovieView(UpdateRateReviewMovieBaseClass):
     form_class = ReviewMovieForm
     template_name = 'movies/update_review.html'
     redirect_to = 'movies:movie-reviews'
     success_message = 'You successfully updated your review on this movie'
-    warning_message = 'You have not reviewed this movie yet, you cannot update your review'
+    warning_message = 'You have not reviewed this movie yet, you cannot update a nonexistent review'
     model = Review
 
 
@@ -223,7 +271,7 @@ class UpdateRateMovieView(UpdateRateReviewMovieBaseClass):
     template_name = 'movies/update_rating.html'
     redirect_to = 'movies:movie-detail'
     success_message = 'You successfully updated your rating of this movie'
-    warning_message = 'You have not rated this movie yet, you cannot update your rating'
+    warning_message = 'You have not rated this movie yet, you cannot update a nonexistent rating'
     model = Rating
 
 
