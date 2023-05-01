@@ -1,4 +1,3 @@
-from typing import Any, Dict
 from django.db.models import Avg
 from django.db.models.query_utils import Q
 from django.contrib import messages
