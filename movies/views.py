@@ -258,3 +258,10 @@ def search_movies(request):
         annotate(avg_rating=Avg('rating__rating'))
     return render(request, 'movies/search_movies.html', {'movies': movies,
                                                          'search_string': search_string})
+
+
+class IndexView(ListView):
+    model = Tag
+    context_object_name = 'genres'
+    template_name = 'movies/index.html'
+    queryset = Tag.objects.order_by('name').all()

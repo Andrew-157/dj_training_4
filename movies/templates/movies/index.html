@@ -3,6 +3,9 @@
 {% block content %}
     <div class="container py-5">
         <h1>Welcome to Cookie</h1>
-
+        <h2>Check out the genres of movies available</h2>
+        {% for genre in genres%}
+            <a href="{% url 'movies:movies-by-genre' genre.slug %}">{{ genre }}</a><br>
+        {% endfor %}
     </div>
 {% endblock %}

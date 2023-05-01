@@ -5,8 +5,7 @@ from movies import views
 
 app_name = 'movies'
 urlpatterns = [
-    path('', TemplateView.as_view(
-        template_name='movies/index.html'), name='index'),
+    path('', views.IndexView.as_view(), name='index'),
     path('become_user/', TemplateView.
          as_view(template_name='movies/become_user.html'), name='become-user'),
     path('movies/genres/<str:genre>/',
@@ -21,5 +20,5 @@ urlpatterns = [
          views.ReviewsByMovieList.as_view(), name='movie-reviews'),
     path('movies/<int:pk>/reviews/update',
          views.UpdateReviewMovieView.as_view(), name='update-review'),
-     path('movies/search/', views.search_movies, name='search-movies')
+    path('movies/search/', views.search_movies, name='search-movies')
 ]
