@@ -18,7 +18,11 @@
         {% for review in reviews %}
             <div class="container py-5">
                 <p>{{ review.content }}</p>
-                <p>Was left by <strong>{{ review.owner }}</strong> on {{ review.pub_date.date }}</p>
+                {% if user.username == review.owner.username %}
+                    <p>You left this review on {{ review.pub_date.date }}</p>
+                {% else %}
+                    <p>Was left by <strong>{{ review.owner }}</strong> on {{ review.pub_date.date }}</p>
+                {% endif %}
             </div>
         {% endfor %}
     </div>
