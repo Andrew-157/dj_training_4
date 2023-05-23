@@ -1,11 +1,12 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.contrib.auth.models import User
 from taggit.models import Tag
-from movies.models import Movie
+from movies.models import Movie, Review
 
 
 @admin.register(Movie)
-class AdminMovie(admin.ModelAdmin):
+class MovieAdmin(admin.ModelAdmin):
     list_display = [
         'title', 'release_date', 'country', 'genres_list', 'image_tag'
     ]
@@ -23,3 +24,16 @@ class AdminMovie(admin.ModelAdmin):
     def image_tag(self, obj):
         return format_html(f'<img src="{obj.poster.url}" width="60" height="100">')
     image_tag.short_description = 'Poster'
+
+
+admin.site.unregister(User)
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = [
+        'username', 'email', 'date_joined',
+        'is_superuser', 'is_active', 'is_staff'
+    ]
+    search_fields = ['username']
+    list_filter = ['username', 'date_joined']
